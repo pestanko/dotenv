@@ -262,6 +262,12 @@ one more line")
       expect(env("FOO=\"bar $ \"")).to eql("FOO" => "bar $ ")
     end
 
+    it 'adds files to includes' do
+      parser = Dotenv::Parser.new("include foo.env\ninclude bar.env")
+      parser.call
+      expect(parser.includes).to include('foo.env', 'bar.env')
+    end
+
     # This functionality is not supported on JRuby or Rubinius
     if (!defined?(RUBY_ENGINE) || RUBY_ENGINE != "jruby") &&
        !defined?(Rubinius)

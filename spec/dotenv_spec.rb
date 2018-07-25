@@ -12,7 +12,7 @@ describe Dotenv do
       it "defaults to .env" do
         expect(Dotenv::Environment).to receive(:new).with(expand(".env"),
                                                           anything)
-          .and_return(double(apply: {}, apply!: {}))
+        .and_return(double(apply: {}, apply!: {}))
         subject
       end
     end
@@ -38,8 +38,8 @@ describe Dotenv do
           "OPTION_C" => "3",
           "OPTION_D" => "4",
           "OPTION_E" => "5",
-          "PLAIN" => "true",
-          "DOTENV" => "true" }
+          "PLAIN"    => "true",
+          "DOTENV"   => "true" }
       end
 
       it "loads all files" do
@@ -164,6 +164,31 @@ describe Dotenv do
       contents = File.open(subject, "rb", &:read).force_encoding("UTF-8")
       expect(contents).to start_with("\xEF\xBB\xBF".force_encoding("UTF-8"))
     end
+  end
+
+  describe "Include" do
+    subject { fixture_path("include.env") }
+
+    let(:expected) do
+      { "OPTION_A"   => "100",
+        "OPTION_B"   => "2",
+        "OPTION_C"   => "3",
+        "OPTION_D"   => "4",
+        "OPTION_E"   => "5",
+        "PLAIN"      => "true",
+        "META_PROP"  => "meta",
+        "DOTENV"     => "true",
+        "FROM_LOCAL" => "true" }
+    end
+
+    it "loads a file with an include statements" do
+      Dotenv.load(subject)
+
+      expected.each do |key, value|
+        expect(ENV[key]).to eq(value)
+      end
+    end
+
   end
 
   def expand(path)

@@ -2,15 +2,18 @@ module Dotenv
   # This class inherits from Hash and represents the environment into which
   # Dotenv will load key value pairs from a file.
   class Environment < Hash
-    attr_reader :filename
+    attr_reader :filename, :includes
 
     def initialize(filename, is_load = false)
       @filename = filename
+      @includes = nil
       load(is_load)
     end
 
     def load(is_load = false)
-      update Parser.call(read, is_load)
+      parser = Parser.new(read, is_load)
+      @includes = parser.includes
+      update parser.call
     end
 
     def read

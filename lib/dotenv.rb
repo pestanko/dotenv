@@ -13,7 +13,11 @@ module Dotenv
     with(*filenames) do |f|
       ignoring_nonexistent_files do
         env = Environment.new(f, true)
-        instrument("dotenv.load", env: env) { env.apply }
+        instrumented = instrument("dotenv.load", env: env) { env.apply }
+        if env.respond_to?(:includes) && !env.includes.empty?
+          load(*env.includes)
+        end
+        instrumented
       end
     end
   end

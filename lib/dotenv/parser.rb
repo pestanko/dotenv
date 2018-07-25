@@ -37,10 +37,13 @@ module Dotenv
       end
     end
 
+    attr_reader :includes
+
     def initialize(string, is_load = false)
       @string = string
       @hash = {}
       @is_load = is_load
+      @includes = []
     end
 
     def call
@@ -64,6 +67,11 @@ module Dotenv
         if variable_not_set?(line)
           raise FormatError, "Line #{line.inspect} has an unset variable"
         end
+      end
+
+      if line.split.first == "include"
+        file_path = line.split[1]
+        @includes << parse_value(file_path) if file_path
       end
     end
 
